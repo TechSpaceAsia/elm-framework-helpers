@@ -18,7 +18,7 @@ def compute_grid_orders(
     with decimal.localcontext() as context:
         context.rounding = decimal.ROUND_DOWN
         for i in range(order_count):
-            multiplier = i + 1
+            multiplier = Decimal(i+1/2)
             price = bid_price - multiplier * gap
             quantity = round(amount_per_order / price, quantity_decimal_places)
             levels.append((
