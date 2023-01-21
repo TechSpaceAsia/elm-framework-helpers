@@ -7,7 +7,7 @@ from logging import getLogger
 import traceback
 import sys
 
-logger = getLogger(__name__)
+logger = getLogger()
 
 
 def debug_observer(prefix: str) -> Observer[Any]:
