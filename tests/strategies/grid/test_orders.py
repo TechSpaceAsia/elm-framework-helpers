@@ -1,4 +1,4 @@
-from elm_framework_helpers.strategies.grid.orders import compute_grid_orders, Grid
+from elm_framework_helpers.strategies.grid.orders import compute_grid_orders
 from decimal import Decimal as D
 
 
@@ -12,13 +12,12 @@ def test_compute_grid_orders():
         quantity_decimal_places=3,
     )
 
-    assert result == Grid(
-        buy_orders=[
-            (D(20), D(5)),
-            (D(18), D("5.555")),
-        ],
-        sell_orders=[
-            (D(21), D(5)),
-            (D(23), D("5.555")),
-        ],
-    )
+    assert result == [
+        (
+            (D('18'), D('5.555')), (D('23'), D('5.555')),
+        ),
+        (
+            (D('16'), D('6.25')), (D('25'), D('6.25'))
+        ),
+    ]
+
