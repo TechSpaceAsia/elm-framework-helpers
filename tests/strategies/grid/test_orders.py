@@ -1,23 +1,25 @@
-from elm_framework_helpers.strategies.grid.orders import compute_grid_orders
+from elm_framework_helpers.strategies.grid.orders import compute_grid_prices
 from decimal import Decimal as D
 
 
-def test_compute_grid_orders():
-    result = compute_grid_orders(
-        bid_price=D(20),
-        ask_price=D(21),
-        amount_per_order=100,
-        gap=2,
-        order_count=2,
-        quantity_decimal_places=3,
+def test_compute_grid_prices():
+    result = compute_grid_prices(
+        price_decimal_places=3,
+        center_price=D('0.42352'),
+        gap=D('0.001'),
+        order_count=10,
     )
 
     assert result == [
-        (
-            (D('19'), D('5.263')), (D('22'), D('5.263')),
-        ),
-        (
-            (D('17'), D('5.882')), (D('24'), D('5.882'))
-        ),
+        D('0.422'),
+        D('0.424'),
+        D('0.421'),
+        D('0.425'),
+        D('0.420'),
+        D('0.426'),
+        D('0.419'),
+        D('0.427'),
+        D('0.418'),
+        D('0.428'),
     ]
 

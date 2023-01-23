@@ -6,27 +6,23 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
-def compute_grid_orders(
-    bid_price: Decimal,
-    ask_price: Decimal,
-    amount_per_order: Decimal,
+def compute_grid_prices( * ,
+    price_decimal_places: int,
+    center_price: Decimal,
     gap: Decimal,
     order_count: int,
-    quantity_decimal_places: int,
-) -> list[tuple[tuple[Decimal, Decimal]]]:
-    levels = []
+) -> list[Decimal]:
     with decimal.localcontext() as context:
         context.rounding = decimal.ROUND_DOWN
-        for i in range(order_count):
-            multiplier = Decimal(i+1/2)
-            price = bid_price - multiplier * gap
-            quantity = round(amount_per_order / price, quantity_decimal_places)
-            levels.append((
-                (price, quantity), (ask_price + multiplier * gap, quantity)
-            ))
+        initial_price = round(center_price - gap, price_decimal_places)
+    prices = []
+    for i in range(order_count):
+        is_even = bool(i % 2)
+        multiplier = (-1 * (i // 2)) if is_even else (2 + i // 2)
+        prices.append(initial_price + gap * multiplier)
+    return prices
 
-    return levels
 
 __all__ = [
-    "compute_grid_orders"
+    "compute_grid_prices"
 ]
