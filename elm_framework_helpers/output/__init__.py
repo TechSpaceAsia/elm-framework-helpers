@@ -29,14 +29,15 @@ def debug_operator(prefix: str):
 
 def info_observer(prefix: str) -> Observer[Any]:
     def fn(x, scope):
-        logger.info(f"[{prefix}][{scope}] - {x}")
+        c = logger.warning if scope == "COMPLETE" else logger.error if scope == "ERROR" else logger.info
+        c(f"[{prefix}] - {x}")
         if scope == "ERROR":
             traceback.print_exception(*sys.exc_info())
 
     return Observer(
         lambda x: fn(x, "NEXT"),
         lambda x: fn(x, "ERROR"),
-        lambda: fn("No message on completion", "COMPLETE"),
+        lambda: fn("Completed", "COMPLETE"),
     )
 
 
