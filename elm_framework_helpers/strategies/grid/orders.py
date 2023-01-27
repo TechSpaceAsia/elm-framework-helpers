@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from decimal import Decimal
 import decimal
 
@@ -12,15 +11,18 @@ class GridPrices(NamedTuple):
     initial: Decimal
     grid: list[Decimal]
 
+def get_initial_price(center_price: Decimal, price_decimal_places: int) -> Decimal:
+    with decimal.localcontext() as context:
+        context.rounding = decimal.ROUND_DOWN
+        return round(center_price, price_decimal_places)
+
 def compute_grid_prices( * ,
     price_decimal_places: int,
     center_price: Decimal,
     gap: Decimal,
     order_count: int,
 ) -> GridPrices:
-    with decimal.localcontext() as context:
-        context.rounding = decimal.ROUND_DOWN
-        initial_price = round(center_price, price_decimal_places)
+    initial_price = get_initial_price(center_price, price_decimal_places)
     return compute_grid_prices_skewed(
         price_decimal_places = price_decimal_places,
         center_price = center_price,
@@ -37,9 +39,7 @@ def compute_grid_prices_skewed(* ,
     gap: Decimal,
     order_count: int,
 ) -> GridPrices:
-    with decimal.localcontext() as context:
-        context.rounding = decimal.ROUND_DOWN
-        initial_price = round(center_price, price_decimal_places)
+    initial_price = get_initial_price(center_price, price_decimal_places)
     buy_prices = []
     for i in range(order_count):
         price = initial_price - gap * (i+1)
@@ -62,4 +62,6 @@ def compute_grid_prices_skewed(* ,
 __all__ = [
     "compute_grid_prices",
     "compute_grid_prices_skewed",
+    "get_initial_price",
+    "GridPrices",
 ]
