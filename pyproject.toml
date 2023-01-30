@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "elm-framework-helpers"
-version = "0.1.9"
+version = "0.1.10"
 description = ""
 authors = ["Mat <mathieu@redapesolutions.com>"]
 readme = "README.md"

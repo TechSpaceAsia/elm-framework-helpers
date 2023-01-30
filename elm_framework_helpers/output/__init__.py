@@ -7,12 +7,11 @@ from logging import getLogger
 import traceback
 import sys
 
-logger = getLogger()
 
-
-def debug_observer(prefix: str) -> Observer[Any]:
+def debug_observer(prefix: str, logger_name: str="") -> Observer[Any]:
+    logger_ = getLogger(logger_name)
     def fn(x, scope):
-        logger.debug(f"[{prefix}][{scope}] - {x}")
+        logger_.debug(f"[{prefix}][{scope}] - {x}")
         if scope == "ERROR":
             traceback.print_exception(*sys.exc_info())
 
@@ -23,13 +22,14 @@ def debug_observer(prefix: str) -> Observer[Any]:
     )
 
 
-def debug_operator(prefix: str):
-    return operators.do(debug_observer(prefix))
+def debug_operator(prefix: str, logger_name: str=""):
+    return operators.do(debug_observer(prefix, logger_name=logger_name))
 
 
-def info_observer(prefix: str) -> Observer[Any]:
+def info_observer(prefix: str, logger_name: str="") -> Observer[Any]:
+    logger_ = getLogger(logger_name)
     def fn(x, scope):
-        c = logger.warning if scope == "COMPLETE" else logger.error if scope == "ERROR" else logger.info
+        c = logger_.warning if scope == "COMPLETE" else logger_.error if scope == "ERROR" else logger_.info
         c(f"[{prefix}] - {x}")
         if scope == "ERROR":
             traceback.print_exception(*sys.exc_info())
@@ -41,13 +41,14 @@ def info_observer(prefix: str) -> Observer[Any]:
     )
 
 
-def info_operator(prefix: str):
-    return operators.do(info_observer(prefix))
+def info_operator(prefix: str, logger_name: str=""):
+    return operators.do(info_observer(prefix, logger_name=logger_name))
 
 
 class LogOnDisposeDisposable(CompositeDisposable):
-    def __init__(self, disposables: List[DisposableBase], message: str = ""):
+    def __init__(self, disposables: List[DisposableBase], message: str = "", logger_name: str=""):
+        logger_ = getLogger(logger_name)
         super().__init__(
             *disposables,
-            Disposable(action=lambda: logger.info("DISPOSING %s", message)),
+            Disposable(action=lambda: logger_.info("DISPOSING %s", message)),
         )
