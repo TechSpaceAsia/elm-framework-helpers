@@ -2,58 +2,18 @@
 
 ## Logging
 
-Here's a sample logging for production:
+Prefer dict based config.
 
-```
-[loggers]
-keys=root,Rx,rawsocket
+## HTTP
 
-[handlers]
-keys=consoleHandler,fileHandler,socketFileHandler
+The `http` module contains a Uvicorn server which can be run outside of the main thread.
 
-[formatters]
-keys=fileFormatter,consoleFormatter,socketFileFormatter
+## Json
 
-[logger_root]
-level=DEBUG
-handlers=consoleHandler,fileHandler
+The `json` module contains an implementation of `dumps` which handles Decimal (turns into string)
 
-[logger_Rx]
-level=INFO
-handlers=consoleHandler
-qualname=Rx
+## Output
 
-[logger_rawsocket]
-qualname=bittrade_kraken_websocket.connection.generic.raw
-handlers=socketFileHandler
+### never_ending_observer
 
-[handler_consoleHandler]
-class=StreamHandler
-level=INFO
-formatter=consoleFormatter
-args=(sys.stdout,)
-
-[handler_fileHandler]
-class=FileHandler
-level=DEBUG
-formatter=fileFormatter
-args=('logfile.log',)
-
-[handler_socketFileHandler]
-class=FileHandler
-level=DEBUG
-formatter=socketFileFormatter
-args=('raw_socket.log',)
-
-[formatter_fileFormatter]
-format=%(asctime)s   - %(name)s - %(levelname)s - %(message)s
-datefmt=%H:%M:%S
-
-[formatter_socketFileFormatter]
-format=%(asctime)s - %(message)s
-datefmt=%H:%M:%S
-
-[formatter_consoleFormatter]
-format=%(asctime)s   - %(levelname)s - %(message)s
-datefmt=%H:%M:%S
-```
+Returns an `OnNext` only observer which logs an error to `logger` if it ever completes or errors.

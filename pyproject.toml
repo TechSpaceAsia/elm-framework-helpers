@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "elm-framework-helpers"
-version = "0.1.10"
+version = "0.2.0"
 description = ""
 authors = ["Mat <mathieu@redapesolutions.com>"]
 readme = "README.md"
@@ -18,8 +18,8 @@ classifiers = [
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
 isort = "^5.11.4"
-mypy = "^0.991"
-pyright = "^1.1.290"
+mypy = "^1.0.1"
+pyright = "^1.1.294"
 pytest = "^7.2.1"
 
 
@@ -43,3 +43,6 @@ float_to_top = true
 [tool.poetry.dependencies]
 python = "^3.10"
 reactivex = "^4.0.4"
+fastapi = "^0.92.0"
+uvicorn = "^0.20.0"
+orjson = "^3.8.6"
