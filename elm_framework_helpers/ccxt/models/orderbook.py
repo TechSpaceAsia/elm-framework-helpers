@@ -1,10 +1,7 @@
+from decimal import Decimal
 from typing import TypedDict, NamedTuple
 
-
-class OrderbookEntry(NamedTuple):
-    price: float
-    volume: float
-
+OrderbookEntry = tuple[float, float]
 
 class Orderbook(TypedDict):
     asks: list[OrderbookEntry]
@@ -13,3 +10,4 @@ class Orderbook(TypedDict):
     timestamp: int
     datetime: str
     nonce: str
+

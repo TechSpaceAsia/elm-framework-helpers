@@ -45,6 +45,7 @@ class EnhancedWebsocket:
     def send_json(self, message: Any):
         message_id, as_bytes = self.prepare_request(message)
         logger.debug("[SOCKET] Sending json to socket: %s", as_bytes)
+        print('SENDING', as_bytes)
         raw_logger.debug(as_bytes.decode())
         self.socket.send(as_bytes)
         return message_id
