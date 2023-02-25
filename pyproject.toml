@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "elm-framework-helpers"
-version = "0.2.2"
+version = "0.2.3"
 description = ""
 authors = ["Mat <mathieu@redapesolutions.com>"]
 readme = "README.md"
@@ -46,3 +46,4 @@ reactivex = "^4.0.4"
 fastapi = "^0.92.0"
 uvicorn = "^0.20.0"
 orjson = "^3.8.6"
+websocket-client = "^1.5.1"

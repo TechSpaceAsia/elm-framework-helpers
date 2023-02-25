@@ -1,16 +1,14 @@
 from logging import getLogger
 from typing import Any, cast
 from reactivex.subject import BehaviorSubject
-import dataclasses
 import reactivex
 
 import orjson
 import websocket
 
-from .request import CryptodotcomRequestMessage
 
 logger = getLogger(__name__)
-raw_logger = getLogger("bittrade_cryptodotcom_websocket.raw_socket.sent")
+raw_logger = getLogger("elm_framework_helpers.raw_socket.sent")
 
 
 class EnhancedWebsocket:
@@ -28,7 +26,7 @@ class EnhancedWebsocket:
 
     def prepare_request(
         self, message: Any
-    ) -> tuple[int, bytes]:
+    ) -> tuple[int | str, bytes]:
         raise NotImplementedError('prepare_request needs to be implemented in enhanced websocket')
         
 
