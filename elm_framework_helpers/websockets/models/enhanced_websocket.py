@@ -22,13 +22,14 @@ class EnhancedWebsocket:
         self.socket = socket
 
     def send_message(self, message: Any) -> int | str:
-        raise NotImplementedError('send_message needs to be implemented in enhanced websocket')
+        raise NotImplementedError(
+            "send_message needs to be implemented in enhanced websocket"
+        )
 
-    def prepare_request(
-        self, message: Any
-    ) -> tuple[int | str, bytes]:
-        raise NotImplementedError('prepare_request needs to be implemented in enhanced websocket')
-        
+    def prepare_request(self, message: Any) -> tuple[int | str, bytes]:
+        raise NotImplementedError(
+            "prepare_request needs to be implemented in enhanced websocket"
+        )
 
     def request_to_observable(
         self, message: dict
@@ -45,7 +46,6 @@ class EnhancedWebsocket:
     def send_json(self, message: Any):
         message_id, as_bytes = self.prepare_request(message)
         logger.debug("[SOCKET] Sending json to socket: %s", as_bytes)
-        print('SENDING', as_bytes)
         raw_logger.debug(as_bytes.decode())
         self.socket.send(as_bytes)
         return message_id
