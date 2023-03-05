@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Binance tester",
+            "type": "python",
+            "request": "launch",
+            "module": "elm_framework_helpers.strategies.binance_tester",
+            "justMyCode": true,
+            "args": [
+                "./tests/file.csv",
+                "0.03"
+            ]
+        },
+        {
             "name": "Tests",
             "type": "python",
             "request": "launch",
