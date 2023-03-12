@@ -1,6 +1,9 @@
 from typing import Any, Callable, Literal, TypeVar, Generator
 from reactivex import observable, disposable, operators
 import reactivex
+import logging
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -10,12 +13,15 @@ def retry_with_delay(delay_pattern: Generator[float, float, float], reset_after:
         resetter.set_disposable(reactivex.never().subscribe())
 
         def make_reset_timer():
+            logger.debug("Resetting retry delay")
+
             return reset_after.subscribe(on_completed=lambda: (
                 delay_pattern.send(0)
             ))
         
         def on_caught_error(_exc, _src):
             delay = next(delay_pattern)
+            logger.debug("Retrying in %s seconds", delay)
             return reactivex.timer(delay).pipe(
                 operators.do_action(on_completed=lambda: (
                     resetter.set_disposable(make_reset_timer())
@@ -24,6 +30,7 @@ def retry_with_delay(delay_pattern: Generator[float, float, float], reset_after:
             )
         
         def cancel_reset(_exc):
+            logger.debug("Canceling reset timer")
             resetter.current.dispose()
 
         return source.pipe(
@@ -65,7 +72,7 @@ def kraken_delay():
     return resettable_counter([0, 0, 1, 2, 5], infinite_behavior="last")
 
 def luno_delay():
-    return resettable_counter([0, 1, 2, 4, 8, 16, 32, 60], infinite_behavior="loop")
+    return resettable_counter([0, 1, 2, 4, 8, 16, 30, 60], infinite_behavior="loop")
 
 def cryptodotcom_delay():
     return resettable_counter([0, 1, 2, 3, 4, 5], infinite_behavior="last")
