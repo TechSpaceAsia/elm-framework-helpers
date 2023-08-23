@@ -4,7 +4,7 @@ from elm_framework_helpers.websockets.models.status import Status
 
 
 WebsocketBundle = tuple[
-    EnhancedWebsocket, MessageTypes, Status | dict
+    EnhancedWebsocket, MessageTypes, Status | dict | list
 ]
 WebsocketStatusBundle = tuple[EnhancedWebsocket, MessageTypes, Status]
 WebsocketMessageBundle = tuple[
