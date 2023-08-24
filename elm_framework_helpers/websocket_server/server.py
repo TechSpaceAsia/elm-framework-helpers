@@ -1,56 +1,80 @@
+import orjson
 import reactivex
-from reactivex import Subject, operators
-from reactivex.scheduler import EventLoopScheduler
-from threading import Thread
-from typing import Any
-from elm_framework_helpers.websocket_server import models
+from reactivex import Observable, Subject, operators
+from typing import Any, Callable
+from elm_framework_helpers.schedulers import NamedEventLoopScheduler
 from websocket_server import WebsocketServer
+from logging import getLogger
+from reactivex.disposable import CompositeDisposable
+
+
+logger = getLogger(__name__)
+
+
+def log_continue(err, _src):
+    logger.exception("Error on websocket trigger")
+    return reactivex.empty()
 
 
 class HtmxWebsocketServer(WebsocketServer):
-    _context: Any
-    _parameters_context: Any
     _new_clients: Subject
     _scheduler: reactivex.abc.SchedulerBase
+    subscription: CompositeDisposable
 
-    def __init__(self, context, parameters_context, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._context = context
-        self._parameters_context = parameters_context
         self._new_clients = Subject()
         self.set_fn_new_client(lambda *_: self._new_clients.on_next(None))
-        self._scheduler = EventLoopScheduler(
-            thread_factory=lambda target: Thread(
-                target=target, daemon=True, name="WebsocketTriggers"
-            )
-        )
+        self._scheduler = NamedEventLoopScheduler("htmx_websocket_server")
+        self.subscription = CompositeDisposable()
 
-    def add_trigger(
-        self,
-        trigger: models.WebsocketTrigger,
-        plain=False,
-    ):
-        def on_message(value):
+    def server_close(self):
+        self.subscription.dispose()
+        self._scheduler.dispose()
+        super().server_close()
+
+    def add_action_received(self, trigger_name, cb):
+        def on_message_received(client, server, message):
             try:
-                content = trigger.callback(
-                    self._context, self._parameters_context, trigger.name, value
-                )
-            except Exception as e:
-                content = f"Failed to render content for {trigger.name}: {e}"
-            if plain:
-                return content
-            hx_swap_oob = f'hx-swap-oob="{trigger.oob_swap}"'
-            return f'<div id="{trigger.name}" {hx_swap_oob}>{content}</div>'
+                message = orjson.loads(message)
+                if trigger_name == message["HEADERS"]["HX-Trigger"]:
+                    cb(message)
+            except:
+                pass
 
-        if trigger.trigger_on_new_client:
-            source = trigger.source.pipe(
+        self.set_fn_message_received(on_message_received)
+
+    @property
+    def scheduler(self):
+        return self._scheduler
+
+    def add_string_trigger(
+        self,
+        src: Observable,
+        cb: Callable[[Any], str] | None = None,
+        trigger_on_new_client: bool = True,
+    ):
+        cb = cb or (lambda x: x)
+        src = src.pipe(
+            operators.observe_on(self._scheduler),
+        )
+        if trigger_on_new_client:
+            src = src.pipe(
                 operators.combine_latest(self._new_clients),
                 operators.map(
                     lambda x: x[0]
                 ),  # don't want value to become a tuple inclusive of the client
             )
-        else:
-            source = trigger.source
-        source.pipe(
-            operators.observe_on(self._scheduler),
-        ).subscribe(lambda value: self.send_message_to_all(on_message(value)))
+
+        def send(x):
+            try:
+                self.send_message_to_all(cb(x))
+            except Exception as e:
+                logger.exception("Error sending socket message")
+
+        self.subscription.add(
+            src.pipe(
+                operators.catch(log_continue),
+                operators.repeat(),
+            ).subscribe(send)
+        )

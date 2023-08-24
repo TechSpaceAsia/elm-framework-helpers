@@ -4,7 +4,10 @@ from typing import TypeVar, Callable
 
 T = TypeVar("T")
 
-def manual_value_or_operator(source: Observable[T]) -> Callable[[Observable[T]], Observable[T]]:
+
+def manual_value_or_operator(
+    source: Observable[T],
+) -> Callable[[Observable[T]], Observable[T]]:
     """Apply to this to a "manual" observable and provide an alternative source. When the manual observable emits None, the source observable will be used until it completes or the manual observable emits a value.
 
     Args:
@@ -13,7 +16,8 @@ def manual_value_or_operator(source: Observable[T]) -> Callable[[Observable[T]],
     Returns:
         Callable[[Observable[T]], Observable[T]]: the operator
     """
-    def manual_value_or(manual: Observable[T]):
+
+    def manual_value_or(manual: Observable[T | None]):
         shared = manual.pipe(operators.share())
         return shared.pipe(
             operators.flat_map_latest(
@@ -29,4 +33,5 @@ def manual_value_or_operator(source: Observable[T]) -> Callable[[Observable[T]],
                 )
             )
         )
+
     return manual_value_or

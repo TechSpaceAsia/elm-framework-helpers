@@ -159,3 +159,5 @@ api_keys.toml
 config_local/
 .hypothesis/
 stories/
+
+.DS_Store
