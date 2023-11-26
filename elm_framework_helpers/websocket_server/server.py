@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 
 def log_continue(err, _src):
-    logger.exception("Error on websocket trigger")
+    logger.error("Error on websocket trigger", exc_info=err)
     return reactivex.empty()
 
 
